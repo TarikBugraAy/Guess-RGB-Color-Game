@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Color Game</title>
+    <title>RGB COLOR GUESSING GAME</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link href='https://fonts.googleapis.com/css?family=Raleway:300' rel='stylesheet' type='text/css'>  
 
 </head>
 <body>
-    <h1 id="tr">The Great <span id="color-display">RGB</span> Guessing Game</h1>
+    <h1 id="tr">SPECTACULAR<span id="color-display">RGB</span> COLOR Guessing Game</h1>
     <div id ="stripe">
         <button id="reset">New Colors</button>
+        <button id="hint">Hint</button>
         <span id="message"></span>
-        <button class="mode">Easy</button>
+        <button class="mode">Easy</button> 
+        <button class="mode">Normal</button>
         <button class="mode selected">Hard</button>
     </div>
     <div id="container">
@@ -24,7 +26,7 @@
     </div>
 <style>
     body {
-    background-color: #232323;   /*grey*/
+    background-color: #f3e8ff; /* Light lavender background */
     font-family: "Raleway", Sans-serif;
     font-size: 62.5%; /*1 em = 10px */
     margin: 0;
@@ -42,20 +44,22 @@
     padding-bottom: 30%;
     float: left;
     margin: 1.66%;
-    /*transition: background .5s; */
-    /*-webkit-transition: background .5s;
-    -moz-transition: background .5s;
-    o-transition: background .5s;*/
+   
 } 
 
 h1 {
-    color: white;
-    background-color: #2C8E99;  /* blue*/
+    color: purple;
+    background-color: PURPLE;
     font-size: 3.5em;
     text-align: center;
     text-transform: uppercase;
     margin: 0;
     padding: 10px 0;
+}
+
+h1, .selected, button:hover {
+    background-color: #6a1b9a; /* A darker shade of purple */
+    color: white;
 }
 
 #color-display {
@@ -64,15 +68,15 @@ h1 {
 }
 
 #stripe {
-    background: white;
     height: 30px;
     text-align: center;
-    color: black;
+    background: #e6ceff; /* A very light purple */
+    color: #6a1b9a;
 }
 
 #message {
     text-transform: uppercase;
-    color: #2C8E99; 
+    color: #6a1b9a; 
     font-size: 1.5em;
     display: inline-block;
     width: 20%;
@@ -80,27 +84,30 @@ h1 {
 
 button {
     
-    color: #2C8E99;
+    color: #6a1b9a;
     font-family: "Raleway", Sans-serif;
     text-transform: uppercase;
     font-size: 1.5em;
-    background-color: white;
+    background-color: purple;
     height: 100%;
     letter-spacing: 1px;
     transition: all 0.3s;
-  /*  -webkit-transition: all 0.3s;
-    -moz-transition: all 0.3s;
-    o-transition: all 0.3s;*/
+  
 }
 
 button:hover {
-    background-color: #2C8E99;
+    background-color: purple;
     color: white;
 }
 
 .selected {
-    background-color: #2C8E99;
-    color: white;
+    background-color: red;
+    color: purple;
+}
+
+#message, button {
+    color: #6a1b9a; /* Matching the darker purple */
+    background-color: transparent;
 }
 
 .square {
@@ -110,9 +117,31 @@ button:hover {
 * {
     border: 0px solid red;
 }
-#tr{
-    background-color: black;
+#tr {
+    background-color: #4a148c; /* Even darker purple for contrast */
 }
+
+@keyframes fadeIn {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+    20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+.correct {
+    animation: fadeIn 3s ease;
+    
+}
+
+.incorrect {
+    animation: shake 1.5s ease;
+}
+
+  
 
 </style>
 <script>
@@ -149,54 +178,67 @@ function setupSquares() {
             if(clickedColor === pickedColor) {
                 messageDisplay.textContent = "Correct";
                 resetButton.textContent = "Play Again";
-                changeColors(pickedColor); /*lao correct kolo yb2a el lon da */
+                changeColors(pickedColor);
+                this.classList.add("correct"); // Add correct class
            }
             else {
                 this.style.backgroundColor = "#232323";
-                messageDisplay.textContent = "try again";
+                messageDisplay.textContent = "Try Again";
+                this.classList.add("incorrect"); // Add incorrect class
+                setTimeout(() => { this.classList.remove("incorrect"); }, 500); // Remove class after animation
             }
         });
     }
 }
 
+
 resetButton.addEventListener("click", function() {
     reset();
 });
 function setupMode() {
-    for(var i = 0; i < modeButtons.length; i++) {          /*3ashan el shakl backgroundcolor*/
+    for(var i = 0; i < modeButtons.length; i++) {
         modeButtons[i].addEventListener("click", function() {
-            for (var i = 0; i < modeButtons.length; i++) {
-                modeButtons[i].classList.remove("selected");
-            }
+            modeButtons.forEach(btn => btn.classList.remove("selected"));
             this.classList.add("selected");
-            if (this.textContent === "Easy") {
-                numSquares = 3;
-            }
-            else {
-                numSquares = 6;
+            switch(this.textContent) {
+                case "Easy":
+                    numSquares = 2;
+                    break;
+                case "Normal":
+                    numSquares = 3;
+                    break;
+                default:
+                    numSquares = 6;
             }
             reset();
         });
     }
 }
 
+
 function reset() {
-    colors = genRandomColors(numSquares);
-    pickedColor = chooseColor();
-    colorDisplay.textContent = pickedColor;
+    colors = genRandomColors(numSquares); // Generate new colors based on difficulty
+    pickedColor = chooseColor(); // Pick a new color to guess
+    colorDisplay.textContent = pickedColor; // Display the new color to guess
     h1.style.backgroundColor = "#2C8E99";
     resetButton.textContent = "New Colors";
     messageDisplay.textContent = "";
+
+    // Loop through all squares
     for (var i = 0; i < squares.length; i++) {
-        if(colors[i]) { 
-            squares[i].style.display = "block";
-            squares[i].style.backgroundColor = colors[i];
+        if (colors[i]) {
+            squares[i].style.display = "block"; // Display the square
+            squares[i].style.backgroundColor = colors[i]; // Assign it a color
+        } else {
+            squares[i].style.display = "none"; // Hide squares not needed for current difficulty
         }
-        else {
-            squares[i].style.display = "none";
-        }
+        squares[i].style.visibility = "visible"; // Ensure displayed squares are visible
     }
+
+    hintsLeft = 3; // Reset hint count for new game
 }
+
+
 
 function changeColors(color) {
     for(var i = 0; i < squares.length; i++) {
@@ -223,6 +265,26 @@ function makeColor() {
     var g = Math.floor(Math.random() * 256);
     var b = Math.floor(Math.random() * 256);
     return "rgb(" + r + ", " + g + ", " + b + ")"; 
+}
+
+var hintButton = document.querySelector("#hint");
+var hintsLeft = 3; // we can set a limit for how many hints are allowed
+
+hintButton.addEventListener("click", function() {
+    if(hintsLeft > 0) {
+        removeOneIncorrectSquare();
+        hintsLeft--;
+    } else {
+        alert("No more hints left!");
+    }
+});
+
+function removeOneIncorrectSquare() {
+    var incorrectSquares = Array.from(squares).filter(square => square.style.backgroundColor !== pickedColor);
+    if(incorrectSquares.length > 0) {
+        var randomSquareToRemove = incorrectSquares[Math.floor(Math.random() * incorrectSquares.length)];
+        randomSquareToRemove.style.visibility = "hidden"; // Hide one incorrect square
+    }
 }
     </script>
 </body>
